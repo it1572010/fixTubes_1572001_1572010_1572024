@@ -14,7 +14,7 @@ namespace fixTubes_1572001_1572010
     {
         float x, y, z;
         Vector3 triPos, KiriKanan, peluruKiri, peluruKanan, AtasBawah, naek;
-        float angle = 0, tampungKiri = 0, tampungKanan = 0, tampungAtas, tampungBawah,tempbebas=0;
+        float angle = 0, tampungKiri = 0, tampungKanan = 0, tampungAtas, tampungBawah,tempbebas=0, angle2=0;
         Matrix4 model, model2, model3, modelView, view, model4;
         public MyGLWindows(int panjang, int lebar) : base(panjang, lebar)
         {
@@ -40,7 +40,6 @@ namespace fixTubes_1572001_1572010
             GL.Enable(EnableCap.DepthTest);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor(Color.SkyBlue);
-
 
             Matrix4 projection, view;
             projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, this.Width / this.Height, 0.1f, 100);
@@ -68,15 +67,15 @@ namespace fixTubes_1572001_1572010
             pesawatAneh();
 
             //objek yg ditembak
-            //model = Matrix4.CreateTranslation(new Vector3(0.6f, 0.5f, 0));
-
-            //model2 = Matrix4.CreateScale(0.2f);
-
-            //modelView = Matrix4.Mult(view, model);
-            //modelView = Matrix4.Mult(model2, modelView);
-            //GL.MatrixMode(MatrixMode.Modelview);
-            //GL.LoadMatrix(ref modelView);
-            //sasaran();
+            model = Matrix4.CreateTranslation(new Vector3(0.6f, 0.5f, 0));
+            model2 = Matrix4.CreateScale(0.2f);
+            angle2 += 0.01f;
+            model3 = Matrix4.CreateRotationY(angle2);
+            modelView = Matrix4.Mult(view, model);
+            modelView = Matrix4.Mult(model2, modelView);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadMatrix(ref modelView);
+            sasaran();
 
             model = Matrix4.CreateTranslation(peluruKiri);
             //ini mah ntar hapus aja rotatenya (optional)
@@ -86,7 +85,6 @@ namespace fixTubes_1572001_1572010
                 {
                     tempbebas += 0.002f;
                 }
-                
             }
             model2 = Matrix4.CreateRotationY(angle);
             model3 = Matrix4.CreateScale(0.2f);
@@ -111,6 +109,7 @@ namespace fixTubes_1572001_1572010
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref modelView);
             peluru();
+
             SwapBuffers();
         }
         private void peluru()
