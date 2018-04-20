@@ -7,6 +7,7 @@ using System.Drawing;
 using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Audio.OpenAL;
 
 namespace fixTubes_1572001_1572010
 {
