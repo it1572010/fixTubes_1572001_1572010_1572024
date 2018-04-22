@@ -15,8 +15,8 @@ namespace fixTubes_1572001_1572010
     {
         float x, y, z;
         Vector3 triPos, KiriKanan, peluruKiri, peluruKanan, AtasBawah, naek;
-        float angle = 0, tampungKiri = 0, tampungKanan = 0, tampungAtas, tampungBawah,tempbebas=0, angle2=0;
-        Matrix4 model, model2, model3, modelView, view, model4;
+        float angle = 0, tampungKiri = 0, tampungKanan = 0, tampungAtas, tampungBawah, tempbebas = 0, angle2 = 0, sudut = 0;
+        Matrix4 model, model2, model3, modelView, view, model4, model5;
         public MyGLWindows(int panjang, int lebar) : base(panjang, lebar)
         {
             Title = "Tubes Grafkom | 1572001 / 1572010 / 1572024";
@@ -59,8 +59,10 @@ namespace fixTubes_1572001_1572010
             //ini mah ntar hapus aja rotatenya (optional)
             //model2 = Matrix4.CreateRotationY(angle);
             model3 = Matrix4.CreateScale(0.7f);
+            model4 = Matrix4.CreateRotationY(sudut);
             modelView = Matrix4.Mult(view, model);
             modelView = Matrix4.Mult(model2, modelView);
+            modelView = Matrix4.Mult(model4, modelView);
             //modelView = Matrix4.Mult(model2, modelView);
             modelView = Matrix4.Mult(model3, modelView);
             GL.MatrixMode(MatrixMode.Modelview);
@@ -87,10 +89,12 @@ namespace fixTubes_1572001_1572010
                     tempbebas += 0.002f;
                 }
             }
-            model2 = Matrix4.CreateRotationY(angle);
+            model2 = Matrix4.CreateRotationY(sudut);
             model3 = Matrix4.CreateScale(0.2f);
             model4 = Matrix4.CreateTranslation(new Vector3(0, tempbebas, 0));
+            model5 = Matrix4.CreateTranslation(AtasBawah);
             modelView = Matrix4.Mult(view, model);
+            modelView = Matrix4.Mult(model5, modelView);
             modelView = Matrix4.Mult(model2, modelView);
             modelView = Matrix4.Mult(model3, modelView);
             modelView = Matrix4.Mult(model4, modelView);
@@ -100,10 +104,12 @@ namespace fixTubes_1572001_1572010
 
             model = Matrix4.CreateTranslation(peluruKanan);
             //ini mah ntar hapus aja rotatenya (optional)
-            model2 = Matrix4.CreateRotationY(angle);
+            model2 = Matrix4.CreateRotationY(sudut);
             model3 = Matrix4.CreateScale(0.2f);
             model4 = Matrix4.CreateTranslation(new Vector3(0, tempbebas, 0));
+            model5 = Matrix4.CreateTranslation(AtasBawah);
             modelView = Matrix4.Mult(view, model);
+            modelView = Matrix4.Mult(model5, modelView);
             modelView = Matrix4.Mult(model2, modelView);
             modelView = Matrix4.Mult(model3, modelView);
             modelView = Matrix4.Mult(model4, modelView);
@@ -997,6 +1003,21 @@ namespace fixTubes_1572001_1572010
             if (Keyboard[Key.Q])
             {
                 y -= 0.1F;
+            }
+            if (Keyboard[Key.Z])
+            {
+                if (sudut == 0)
+                {
+                    sudut = 3;
+                }
+                else
+                {
+                    sudut = 0;
+                }
+            }
+            if (Keyboard[Key.R])
+            {
+                tempbebas = 0;
             }
         }
     }
