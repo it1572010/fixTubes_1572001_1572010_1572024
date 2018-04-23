@@ -100,8 +100,10 @@ namespace fixTubes_1572001_1572010
             //ini mah ntar hapus aja rotatenya (optional)
             //model2 = Matrix4.CreateRotationY(angle);
             model3 = Matrix4.CreateScale(0.7f);
+            model4 = Matrix4.CreateRotationY(sudut);
             modelView = Matrix4.Mult(view, model);
             modelView = Matrix4.Mult(model2, modelView);
+            modelView = Matrix4.Mult(model4, modelView);
             //modelView = Matrix4.Mult(model2, modelView);
             modelView = Matrix4.Mult(model3, modelView);
             GL.MatrixMode(MatrixMode.Modelview);
@@ -155,13 +157,34 @@ namespace fixTubes_1572001_1572010
 
             //}
             //peluru();
+            if (Keyboard[Key.Space])
+            {
+                for(int i = 0; i <= this.Height+100; i++)
+                {
+                    tempbebas += 0.002f;
+                }
+            }
+            model2 = Matrix4.CreateRotationY(sudut);
+            model3 = Matrix4.CreateScale(0.2f);
+            model4 = Matrix4.CreateTranslation(new Vector3(0, tempbebas, 0));
+            model5 = Matrix4.CreateTranslation(AtasBawah);
+            modelView = Matrix4.Mult(view, model);
+            modelView = Matrix4.Mult(model5, modelView);
+            modelView = Matrix4.Mult(model2, modelView);
+            modelView = Matrix4.Mult(model3, modelView);
+            modelView = Matrix4.Mult(model4, modelView);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadMatrix(ref modelView);
+            peluru();
 
             model = Matrix4.CreateTranslation(peluruKanan);
             //ini mah ntar hapus aja rotatenya (optional)
-            model2 = Matrix4.CreateRotationY(angle);
+            model2 = Matrix4.CreateRotationY(sudut);
             model3 = Matrix4.CreateScale(0.2f);
             model4 = Matrix4.CreateTranslation(new Vector3(0, tempbebas, 0));
+            model5 = Matrix4.CreateTranslation(AtasBawah);
             modelView = Matrix4.Mult(view, model);
+            modelView = Matrix4.Mult(model5, modelView);
             modelView = Matrix4.Mult(model2, modelView);
             modelView = Matrix4.Mult(model3, modelView);
             modelView = Matrix4.Mult(model4, modelView);
@@ -1064,6 +1087,20 @@ namespace fixTubes_1572001_1572010
                 Title = "works";
                 //lp.tempbebas = 0;
                 lp.addPeluru();
+            if (Keyboard[Key.Z])
+            {
+                if (sudut == 0)
+                {
+                    sudut = 3;
+                }
+                else
+                {
+                    sudut = 0;
+                }
+            }
+            if (Keyboard[Key.R])
+            {
+                tempbebas = 0;
             }
         }
     }
