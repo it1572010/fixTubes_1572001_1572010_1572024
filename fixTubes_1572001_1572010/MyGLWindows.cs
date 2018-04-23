@@ -8,6 +8,8 @@ using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Audio.OpenAL;
+using System.Drawing.Imaging;
+using System.Timers;
 
 namespace fixTubes_1572001_1572010
 {
@@ -17,6 +19,7 @@ namespace fixTubes_1572001_1572010
         Vector3 triPos, KiriKanan, peluruKiri, peluruKanan, AtasBawah, naek;
         float angle = 0, tampungKiri = 0, tampungKanan = 0, tampungAtas, tampungBawah,tempbebas=0, angle2=0;
         Matrix4 model, model2, model3, modelView, view, model4;
+        ListPeluru lp;
         public MyGLWindows(int panjang, int lebar) : base(panjang, lebar)
         {
             Title = "Tubes Grafkom | 1572001 / 1572010 / 1572024";
@@ -25,20 +28,58 @@ namespace fixTubes_1572001_1572010
             z = 3;
             triPos = new Vector3(0, 1, 0);
             KiriKanan = new Vector3(0, -0.5f, 0);
-            //peluruKiri = new Vector3(-0.07f, -0.85f, 0);
-            //peluruKanan = new Vector3(0.07f, -0.85f, 0);
             peluruKiri = new Vector3(-0.07f, -0.85f, 0);
             peluruKanan = new Vector3(0.07f, -0.85f, 0);
+            lp = new ListPeluru();
         }
+        static int LoadTexture(string filename)
+        {
+            if (String.IsNullOrEmpty(filename))
+                throw new ArgumentException(filename);
 
+            int id = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, id);
+
+            Bitmap bmp = new Bitmap(filename);
+            BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+
+            bmp.UnlockBits(bmp_data);
+
+            // We haven't uploaded mipmaps, so disable mipmapping (otherwise the texture will not appear).
+            // On newer video cards, we can use GL.GenerateMipmaps() or GL.Ext.GenerateMipmaps() to create
+            // mipmaps automatically. In that case, use TextureMinFilter.LinearMipmapLinear to enable them.
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+
+            return id;
+        }
         protected override void OnLoad(EventArgs e)
         {
-            base.OnLoad(e);
-        }
+            GL.Enable(EnableCap.DepthTest);
+            //int texture = LoadTexture(@"C:\Users\lisansulistiani\Pictures\wallpapper\h24.jpg");
+            //GL.MatrixMode(MatrixMode.Projection);
+            //GL.LoadIdentity();
+            //GL.Ortho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+            //GL.MatrixMode(MatrixMode.Modelview);
+            //GL.LoadIdentity();
 
+            //GL.Enable(EnableCap.Texture2D);
+            //GL.BindTexture(TextureTarget.Texture2D, texture);
+
+            //GL.Begin(PrimitiveType.Quads);
+
+            //GL.TexCoord2(0.0f, 1.0f); GL.Vertex2(-1.0f, -1.0f);
+            //GL.TexCoord2(1.0f, 1.0f); GL.Vertex2(1.0f, -1.0f);
+            //GL.TexCoord2(1.0f, 0.0f); GL.Vertex2(1.0f, 1.0f);
+            //GL.TexCoord2(0.0f, 0.0f); GL.Vertex2(-1.0f, 1.0f);
+
+            //GL.End();
+        }
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            GL.Enable(EnableCap.DepthTest);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor(Color.SkyBlue);
 
@@ -68,35 +109,52 @@ namespace fixTubes_1572001_1572010
             pesawatAneh();
 
             //objek yg ditembak
-            model = Matrix4.CreateTranslation(new Vector3(0.6f, 0.5f, 0));
-            model2 = Matrix4.CreateScale(0.2f);
-            angle2 += 0.01f;
-            model3 = Matrix4.CreateRotationY(angle2);
-            modelView = Matrix4.Mult(view, model);
-            modelView = Matrix4.Mult(model2, modelView);
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadMatrix(ref modelView);
-            sasaran();
+            List<Sasaran> s= new List<Sasaran>();
+            for (float i = -1f; i < 1f; i+=0.2f)
+            {
+                s.Add((new Sasaran(i, 0.5f, 0)));
+            }
+            //model = Matrix4.CreateTranslation(new Vector3(0.6f, 0.5f, 0));
+            //model2 = Matrix4.CreateScale(0.2f);
+            //angle2 += 0.01f;
+            //model3 = Matrix4.CreateRotationY(angle2);
+            //modelView = Matrix4.Mult(view, model);
+            //modelView = Matrix4.Mult(model2, modelView);
+            //GL.MatrixMode(MatrixMode.Modelview);
+            //GL.LoadMatrix(ref modelView);
+            // sasaran();
+
+
 
             model = Matrix4.CreateTranslation(peluruKiri);
             //ini mah ntar hapus aja rotatenya (optional)
-            if (Keyboard[Key.Space])
-            {
-                for(int i = 0; i <= this.Height+100; i++)
-                {
-                    tempbebas += 0.002f;
-                }
-            }
-            model2 = Matrix4.CreateRotationY(angle);
-            model3 = Matrix4.CreateScale(0.2f);
-            model4 = Matrix4.CreateTranslation(new Vector3(0, tempbebas, 0));
-            modelView = Matrix4.Mult(view, model);
-            modelView = Matrix4.Mult(model2, modelView);
-            modelView = Matrix4.Mult(model3, modelView);
-            modelView = Matrix4.Mult(model4, modelView);
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadMatrix(ref modelView);
-            peluru();
+            //if (Keyboard[Key.Space])
+            //{
+            //    for(int i = 0; i <= this.Height+100; i++)
+            //    {
+            //        tempbebas += 0.002f;
+            //    }
+
+            //tempbebas += 0.08f;
+            //if(tempbebas>10f)
+            //{
+            //    tempbebas = 0;
+            //}
+            //model2 = Matrix4.CreateRotationY(angle);
+            //model3 = Matrix4.CreateScale(0.2f);
+            //model4 = Matrix4.CreateTranslation(new Vector3(0, tempbebas, 0));
+            //modelView = Matrix4.Mult(view, model);
+            //modelView = Matrix4.Mult(model2, modelView);
+            //modelView = Matrix4.Mult(model3, modelView);
+            //modelView = Matrix4.Mult(model4, modelView);
+            //GL.MatrixMode(MatrixMode.Modelview);
+            //GL.LoadMatrix(ref modelView);
+
+            lp.move(peluruKiri.X);
+            lp.addPeluru();
+
+            //}
+            //peluru();
 
             model = Matrix4.CreateTranslation(peluruKanan);
             //ini mah ntar hapus aja rotatenya (optional)
@@ -110,9 +168,10 @@ namespace fixTubes_1572001_1572010
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref modelView);
             peluru();
-
+            
             SwapBuffers();
         }
+       
         private void peluru()
         {
             //peluru
@@ -930,9 +989,11 @@ namespace fixTubes_1572001_1572010
                 angle -= 0.05f;
                 //z += 0.1F;
             }
+            
             //tembak peluru
-            //if (Keyboard[Key.Space])
-            //{
+            if (Keyboard[Key.Space])
+            {
+                lp.addPeluru();
             //    //peluruKiri.X = tampungKiri;
             //    //peluruKanan.X = tampungKanan;
             //    //peluruKiri.Y = y;
@@ -942,7 +1003,7 @@ namespace fixTubes_1572001_1572010
             //        tempbebas += 0.1f;
             //    }
                 
-            //}
+            }
             //gerak ke kiri
             if (Keyboard[Key.Left])
             {
@@ -997,6 +1058,12 @@ namespace fixTubes_1572001_1572010
             if (Keyboard[Key.Q])
             {
                 y -= 0.1F;
+            }
+            if(Keyboard[Key.R])
+            {
+                Title = "works";
+                //lp.tempbebas = 0;
+                lp.addPeluru();
             }
         }
     }
